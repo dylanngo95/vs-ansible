@@ -1,0 +1,9 @@
+[bastion]
+bastion
+
+[webserver]
+magento
+cron
+
+[es]
+es

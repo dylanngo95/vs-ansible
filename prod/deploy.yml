@@ -1,0 +1,14 @@
+---
+- hosts: webserver
+  become: yes
+  become_user: root
+
+  vars:
+    - docroot: /var/www/magento2
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: true
