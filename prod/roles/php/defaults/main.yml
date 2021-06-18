@@ -1,0 +1,5 @@
+---
+php7:
+  start: false
+  service_enabled: no
+  run_as: ubuntu

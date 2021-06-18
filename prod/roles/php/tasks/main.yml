@@ -1,0 +1,58 @@
+---
+- name: Add php repository
+  apt_repository:
+    repo: "ppa:ondrej/php"
+    state: present
+
+- name: Install php fpm
+  apt:
+    state: present
+    pkg:
+      - php7.4-fpm
+      - php7.4-common
+      - php7.4-cli
+      - php7.4-fpm
+      - php7.4-opcache
+      - php7.4-gd
+      - php7.4-mysql
+      - php7.4-curl
+      - php7.4-intl
+      - php7.4-xsl
+      - php7.4-mbstring
+      - php7.4-zip
+      - php7.4-bcmath
+      - php7.4-soap
+
+- name: Configuration php
+  become: yes
+  become_user: root
+  ini_file:
+    path: /etc/php/7.4/cli/php.ini
+    regexp: "^{{ item.param }} ="
+    line=: "{{ item.param }} = {{ item.value }}"
+    state: present
+  with_items:
+    - { param: 'error_reporting', value: "E_ALL" }
+    - { param: 'display_errors', value: "On" }
+    - { param: 'post_max_size', value: "128M" }
+    - { param: 'upload_max_filesize', value: "128M" }
+    - { param: 'memory_limit', value: "128M" }
+    - { param: 'max_input_time', value: "30" }
+    - { param: 'max_execution_time', value: "30" }
+    - { param: 'short_open_tag', value: "Off" }
+    - { param: 'date.timezone' , value: "Europe/Paris" }
+    - { param: 'cgi.fix_pathinfo' , value: "0" }
+    - { param: 'phar.readonly' , value: "Off" }
+    - { param: 'expose_php' , value: "On" }
+
+- name: Configuration php-fpm 7.4
+  lineinfile:
+    dest: "/etc/php/7.4/fpm/pool.d/www.conf"
+    regexp: "^{{ item.param }} ="
+    line: "{{ item.param }} = {{ item.value }}"
+  with_items:
+    - { param: user, value: "{{ php7.run_as }}" }
+    - { param: group, value: "{{ php7.run_as }}" }
+    - { param: listen.owner, value: "{{ php7.run_as }}" }
+    - { param: listen.group, value: "{{ php7.run_as }}" }
+    - { param: listen.mode, value: "0666" }
